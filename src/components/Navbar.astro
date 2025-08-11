@@ -1,0 +1,41 @@
+---
+// URLs estáticas (const link)
+const navLinks = [
+  { href: "/", label: "Listado" },
+  { href: "/pokemons/1", label: "Páginado" },
+  { href: "/favorites", label: "Favoritos" },
+];
+
+// URL actual (Astro.url.pathname)
+const currentPath = Astro.url.pathname;
+
+// Función para determinar si un enlace está activo
+const isActiveLink = (href: string) => {
+  if (href === "/" && currentPath === "/") return true;
+  if (href !== "/" && currentPath.startsWith(href)) return true;
+  return false;
+};
+---
+
+<!-- component -->
+<nav class="shadow bg-slate-800">
+  <div
+    class="container flex items-center justify-center p-6 mx-auto text-white capitalize"
+  >
+    {
+      navLinks.map(({ href, label }) => (
+        <div class="relative">
+          <a href={href} class="mx-1.5 sm:mx-6 block">
+            {label}
+          </a>
+          {isActiveLink(href) && (
+            <div
+              transition:name="underline"
+              class="absolute bottom-0 left-0 right-0 border-b-2 border-blue-500"
+            />
+          )}
+        </div>
+      ))
+    }
+  </div>
+</nav>

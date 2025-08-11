@@ -1,0 +1,25 @@
+---
+interface Props {
+  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p";
+  class?: string;
+}
+
+const { as: Element = "p", class: className = "", ...props } = Astro.props;
+
+// Estilos base por elemento
+const baseStyles = {
+  h1: "text-4xl md:text-6xl font-bold text-slate-100",
+  h2: "text-3xl md:text-5xl font-semibold text-slate-100",
+  h3: "text-2xl md:text-4xl font-semibold text-slate-200",
+  h4: "text-xl md:text-3xl font-medium text-slate-200",
+  h5: "text-lg md:text-2xl font-medium text-slate-200",
+  h6: "text-base md:text-xl font-medium text-slate-300",
+  p: "text-base leading-relaxed text-slate-300",
+};
+
+const elementClasses = `${baseStyles[Element]} ${className}`.trim();
+---
+
+<Element class={elementClasses} {...props}>
+  <slot />
+</Element>

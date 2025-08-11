@@ -1,0 +1,27 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+import { ClientRouter } from "astro:transitions";
+import Navbar from "@components/Navbar.astro";
+import "@styles/global.css";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <!-- Required by the Astro framework -->
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+  <body class="bg-slate-800 text-slate-100">
+    <Navbar />
+    <main class="my-10 m-auto max-w-3xl">
+      <slot />
+    </main>
+  </body>
+</html>
