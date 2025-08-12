@@ -4,7 +4,8 @@ import type { PokemonListResponse } from "@interfaces/pokemon-list.response";
 import PokemonCard from "@components/pokemons/PokemonCard.astro";
 import Title from "@components/shared/Title.astro";
 import MainLayout from "@layouts/MainLayout.astro";
-import { Icon } from "astro-icon/components";
+import HeartOutline from "@icons/HeartOutline.astro";
+import HeartFilled from "@icons/HeartFilled.astro";
 
 export const getStaticPaths = (async () => {
   const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
@@ -36,13 +37,8 @@ const audioSrc =
         data-name={name}
         data-id={id}
       >
-        <Icon name="heart-outline" size={50} style="color:#fd0004;" />
-        <Icon
-          name="heart-full"
-          size={50}
-          style="color:#fd0004;"
-          class="hidden"
-        />
+        <HeartOutline size={50} data-outline />
+        <HeartFilled size={50} class="hidden" data-filled />
       </button>
     </div>
     <PokemonCard name={name} url={url} isBig />
@@ -53,12 +49,52 @@ const audioSrc =
   </section>
 </MainLayout>
 <script>
+  // Interfaz TypeScript para definir la estructura de un Pokémon favorito
+  interface FavoritePokemon {
+    id: string;
+    name: string;
+  }
+
+  // Evento que se dispara cuando la página de Astro se carga completamente
   document.addEventListener("astro:page-load", () => {
-    const btnFavorite = document.getElementById(
-      "btn-favorite"
-    ) as HTMLButtonElement;
-    if (!btnFavorite) return;
-    const name = btnFavorite.dataset.name;
-    const id = btnFavorite.dataset.id;
+    // Utilidades para manejo de localStorage
+    const getFavorites = (): FavoritePokemon[] =>
+      JSON.parse(localStorage.getItem("favorites") ?? "[]");
+    const saveFavorites = (favs: FavoritePokemon[]) =>
+      localStorage.setItem("favorites", JSON.stringify(favs));
+
+    // Elementos del DOM
+    const btn = document.getElementById("btn-favorite") as HTMLButtonElement;
+    if (!btn) return;
+
+    // Extraer datos del pokémon usando destructuring
+    const { name = "", id = "" } = btn.dataset;
+    const [outline, filled] = ["[data-outline]", "[data-filled]"].map(
+      (selector) => btn.querySelector(selector) as HTMLElement
+    );
+
+    // Funciones principales
+    const isFavorite = () => getFavorites().some((fav) => fav.name === name);
+    const updateUI = () => {
+      const isFav = isFavorite();
+      // Alternar visibilidad de íconos basado en el estado de favorito
+      outline.classList.toggle("hidden", isFav);
+      filled.classList.toggle("hidden", !isFav);
+    };
+
+    // Inicialización: mostrar el estado correcto al cargar la página
+    updateUI();
+
+    // Event listener: alternar favorito al hacer clic
+    btn.onclick = () => {
+      const favs = getFavorites();
+      // Usar operador ternario y spread operator para actualizar la lista
+      const newFavs = isFavorite()
+        ? favs.filter((fav) => fav.name !== name) // Remover si existe
+        : [...favs, { id, name }]; // Agregar si no existe
+
+      saveFavorites(newFavs);
+      updateUI();
+    };
   });
 </script>
